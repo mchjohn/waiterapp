@@ -10,12 +10,13 @@ export const Board = styled.div`
   flex-direction: column;
   align-items: center;
 
-  header: {
+  > header {
     padding: 8px;
     font-size: 14px;
 
-    gap: 8px;
+    gap: 4px;
     display: flex;
+    flex: 1;
     align-items: center;
   }
 `
