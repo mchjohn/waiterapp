@@ -1,5 +1,6 @@
 import { Menu } from '../Menu';
 import { Header } from '../Header';
+import { Button } from '../Button';
 import { Categories } from '../Categories';
 
 import {
@@ -27,7 +28,9 @@ export function Main() {
 
       <FooterContainer>
         <Footer>
-
+          <Button onPress={() => {}}>
+            Novo Pedido
+          </Button>
         </Footer>
       </FooterContainer>
     </>
