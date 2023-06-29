@@ -1,7 +1,10 @@
+import { useState } from 'react';
+
 import { Menu } from '../Menu';
 import { Header } from '../Header';
 import { Button } from '../Button';
 import { Categories } from '../Categories';
+import { TableModal } from '../TableModal';
 
 import {
   Container,
@@ -12,6 +15,17 @@ import {
 } from './styles';
 
 export function Main() {
+  const [selectedTable, setSelectedTable] = useState('');
+  const [isTableModalVisible, setIsTableModalVisible] = useState(false);
+
+  function handleToggleModal() {
+    setIsTableModalVisible(prev => !prev);
+  }
+
+  function handleSaveTableNumber(tableNumber: string) {
+    setSelectedTable(tableNumber);
+  }
+
   return (
     <>
       <Container>
@@ -28,11 +42,19 @@ export function Main() {
 
       <FooterContainer>
         <Footer>
-          <Button onPress={() => {}}>
-            Novo Pedido
-          </Button>
+          {!selectedTable &&
+            <Button onPress={handleToggleModal}>
+              Novo Pedido
+            </Button>
+          }
         </Footer>
       </FooterContainer>
+
+      <TableModal
+        visible={isTableModalVisible}
+        onSave={handleSaveTableNumber}
+        onClose={handleToggleModal}
+      />
     </>
   );
 }
