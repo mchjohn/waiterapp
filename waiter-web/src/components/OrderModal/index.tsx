@@ -8,10 +8,20 @@ import { Overlay, ModalBody, OrderDetails, Actions } from './styles'
 interface OrderModalProps {
   order: Order | null
   visible: boolean
+  isLoading: boolean
   onClose(): void
+  onCancelOrder(): Promise<void>
+  onChangeOrderStatus(): Promise<void>
 }
 
-export function OrderModal({ order, visible, onClose }: OrderModalProps) {
+export function OrderModal({
+  order,
+  visible,
+  isLoading,
+  onClose,
+  onCancelOrder,
+  onChangeOrderStatus
+}: OrderModalProps) {
   if (!visible || !order) return null
 
   const total = order.products.reduce((acc, { product, quantity }) => {
@@ -72,12 +82,30 @@ export function OrderModal({ order, visible, onClose }: OrderModalProps) {
         </OrderDetails>
 
         <Actions>
-          <button type="button" className='primary'>
-            <span>👩‍🍳</span>
-            <strong>Iniciar Produção</strong>
-          </button>
+          {order.status !== 'DONE' && (
+            <button
+              type="button"
+              className='primary'
+              disabled={isLoading}
+              onClick={onChangeOrderStatus}
+            >
+              <span>
+                {order.status === 'AWAITING' && '👩‍🍳'}
+                {order.status === 'IN_PRODUCTION' && '✅'}
+              </span>
+              <strong>
+                {order.status === 'AWAITING' && 'Iniciar Produção'}
+                {order.status === 'IN_PRODUCTION' && 'Concluir pedido'}
+              </strong>
+            </button>
+          )}
 
-          <button type="button" className='secondary'>
+          <button
+            type="button"
+            className='secondary'
+            disabled={isLoading}
+            onClick={onCancelOrder}
+          >
             <strong>Cancelar Pedido</strong>
           </button>
         </Actions>
