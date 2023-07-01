@@ -25,14 +25,30 @@ export const ModalBody = styled.View`
   background: #FAFAFA;
 `;
 
-export const ModalForm = styled.View`
+export const IngredientsContainer = styled.View`
+  flex: 1;
   margin-top: 32px;
 `;
 
-export const ModalInput = styled.TextInput`
-  border: 1px solid rgba(204, 204, 204, 0.5);
+export const Ingredient = styled.View`
   padding: 16px;
-  background: #FFF;
+  border: 1px solid rgba(204, 204, 204, 0.3);
   border-radius: 8px;
-  margin-bottom: 24px;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 4px;
 `;
+
+export const FooterContainer = styled.SafeAreaView`
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+`;
+
+export const Footer = styled.View`
+  min-height: 110px;
+  background: #FFF;
+  padding: 16px 24px;
+`;
+
+export const PriceContainer = styled.View``;
