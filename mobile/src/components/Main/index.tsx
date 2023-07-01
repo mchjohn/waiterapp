@@ -1,12 +1,15 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ActivityIndicator } from 'react-native';
 
 import { Product } from '../../types/products';
 import { CartItem } from '../../types/cartItem';
-import { products as mockProducts } from '../../mocks/products';
+import { Category } from '../../types/category';
+
+import { Empty } from '../Icons/Empty';
 
 import { Menu } from '../Menu';
 import { Cart } from '../Cart';
+import { Text } from '../Text';
 import { Header } from '../Header';
 import { Button } from '../Button';
 import { Categories } from '../Categories';
@@ -20,12 +23,13 @@ import {
   Footer,
   CenteredContainer,
 } from './styles';
-import { Empty } from '../Icons/Empty';
-import { Text } from '../Text';
+import { api } from '../../utils/api';
 
 export function Main() {
-  const [products, setProducts] = useState<Product[]>(mockProducts);
-  const [isLoading, setIsLoading] = useState(false);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingProducts, setIsLoadingProducts] = useState(false);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [selectedTable, setSelectedTable] = useState('');
   const [isTableModalVisible, setIsTableModalVisible] = useState(false);
@@ -92,39 +96,67 @@ export function Main() {
     });
   }
 
+  async function handleSelectCategory(categoryId: string) {
+    const route = !categoryId ? '/products' : `/categories/${categoryId}/products`;
+
+    setIsLoadingProducts(true);
+
+    const { data } = await api.get(route);
+
+    setProducts(data);
+
+    setIsLoadingProducts(false);
+  }
+
+  useEffect(() => {
+    Promise.all([
+      api.get('/categories'),
+      api.get('/products')
+    ]).then(([categoryResponse, productResponse]) => {
+      setCategories(categoryResponse.data);
+      setProducts(productResponse.data);
+
+      setIsLoading(false);
+    });
+  }, []);
+
   return (
     <>
       <Container>
         <Header selectedTable={selectedTable} onCancelOrder={handleResetOrder} />
 
-        {isLoading && (
+        {isLoading ? (
           <CenteredContainer>
             <ActivityIndicator color='#d73035' size='large' />
           </CenteredContainer>
-        )}
-
-        {!isLoading && (
+        ) : (
           <>
             <CategoriesContainer>
-              <Categories />
+              <Categories categories={categories} onSelectCategory={handleSelectCategory} />
             </CategoriesContainer>
 
-            {products.length > 0 ? (
-              <MenuContainer>
-                <Menu products={products} onAddToCart={handleAddToCart} />
-              </MenuContainer>
-            ) : (
+            {isLoadingProducts ? (
               <CenteredContainer>
-                <Empty />
-                <Text color='#666' style={{ marginTop: 24 }}>
-                  Nenhum produto foi encontrado
-                </Text>
+                <ActivityIndicator color='#d73035' size='large' />
               </CenteredContainer>
+            ) : (
+              <>
+                {products.length > 0 ? (
+                  <MenuContainer>
+                    <Menu products={products} onAddToCart={handleAddToCart} />
+                  </MenuContainer>
+                ) : (
+                  <CenteredContainer>
+                    <Empty />
+                    <Text color='#666' style={{ marginTop: 24 }}>
+                    Nenhum produto foi encontrado
+                    </Text>
+                  </CenteredContainer>
+                )}
+              </>
             )}
-
           </>
         )}
-
       </Container>
 
       <Footer>
@@ -138,6 +170,7 @@ export function Main() {
           {selectedTable &&
             <Cart
               cartItems={cartItems}
+              selectedTable={selectedTable}
               onAdd={handleAddToCart}
               onRemove={handleDecrementItemCart}
               onConfirmOrder={handleResetOrder}
